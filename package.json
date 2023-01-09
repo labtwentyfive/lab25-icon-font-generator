@@ -1,0 +1,33 @@
+{
+  "name": "lab25-icon-font-generator",
+  "version": "0.1.0",
+  "description": "Icon font generator for material design icons with support for custom icons",
+  "main": "./lib/cjs/index.js",
+  "module": "./lib/esm/index.js",
+  "files": [
+    "lib/"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/labtwentyfive/lab25-icon-font-generator.git"
+  },
+  "author": "Lab25 GmbH",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/labtwentyfive/lab25-icon-font-generator/issues"
+  },
+  "homepage": "https://github.com/labtwentyfive/lab25-icon-font-generator#readme",
+  "devDependencies": {
+    "@mdi/svg": "^7.1.96",
+    "@types/node": "^18.11.18",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "fast-glob": "^3.2.12",
+    "linebyline": "^1.3.0",
+    "webfont": "9.0.0"
+  }
+}

@@ -1,0 +1,10 @@
+yarn-debug.log*
+.yarn-integrity
+
+data
+.env
+.DS_Store
+.tool-versions
+
+/node_modules
+yarn-error.log
