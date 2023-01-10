@@ -191,7 +191,7 @@ export default class {
       });
 
     this.meta = [...custom_icons, ...mdi_meta].filter((item) => {
-      return this.icons.includes(item.name) || mdi_meta.some((i) => i.aliases.includes(item.name));
+      return this.icons.includes(item.name) || mdi_meta.some((i) => i.aliases.includes(item.name) && this.icons.includes(i.name));
     });
 
     await this.check_svg_naming();
