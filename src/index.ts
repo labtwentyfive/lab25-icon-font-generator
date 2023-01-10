@@ -45,8 +45,8 @@ const Helper = {
 export default class {
   public paths = {
     dist: {
-      font: resolve(cwd, "app/frontend/assets/fonts"),
-      variables: resolve(cwd, "app/frontend/styles/typography/mdi"),
+      font: "",
+      variables: "",
     },
     mdi: {
       meta: resolve(cwd, "node_modules/@mdi/svg/meta.json"),
@@ -81,6 +81,8 @@ export default class {
   constructor(config: BuilderConfig) {
     console.log(`::: ---`);
     console.log(`::: Lab25 mdi iconfont generator with custom icon support`);
+    this.paths.dist.font = resolve(cwd, config.paths.dist.font);
+    this.paths.dist.variables = resolve(cwd, config.paths.dist.variables);
     this.paths.custom.svgs = resolve(cwd, config.paths.custom.svgs);
     this.paths.scanner = config.paths.scanner;
   }
