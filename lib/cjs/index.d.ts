@@ -76,7 +76,7 @@ export default class {
     };
     initialize(): Promise<void>;
     scan(): Promise<void>;
-    build(): Promise<void>;
+    build(): Promise<unknown>;
     private initialize_build;
     private check_svg_naming;
     private compile;

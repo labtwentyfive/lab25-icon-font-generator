@@ -161,40 +161,50 @@ export default class {
   }
 
   public async build() {
-    console.log(`::: BUILD: start`);
-    await this.initialize_build();
-    await this.compile();
-    console.log(`::: BUILD: done`);
+    try {
+      console.log(`::: BUILD: start`);
+      await this.initialize_build();
+      await this.compile();
+      console.log(`::: BUILD: done`);
+    } catch (err) {
+      console.error(err);
+      return err;
+    }
   }
 
   private async initialize_build() {
-    const mdi_meta: Meta[] = await Helper.readFileAndParse(this.paths.mdi.meta);
+    try {
+      const mdi_meta: Meta[] = await Helper.readFileAndParse(this.paths.mdi.meta);
 
-    let available_codepoints = mdi_meta.filter((item) => !this.icons.includes(item.name)).map((item) => item.codepoint);
+      let available_codepoints = mdi_meta.filter((item) => !this.icons.includes(item.name)).map((item) => item.codepoint);
 
-    const custom_icons_path_files = await readdir(this.paths.custom.svgs);
-    const custom_icons: Meta[] = custom_icons_path_files
-      .filter((item) => extname(item) === ".svg")
-      .map((item, index) => {
-        const codepoint = available_codepoints[Math.floor(Math.random() * available_codepoints.length)];
-        available_codepoints = available_codepoints.filter((item) => item !== codepoint);
-        return {
-          name: parse(item).name,
-          id: `1k5-${index}`,
-          author: "Lab25",
-          codepoint: codepoint,
-          custom: true,
-          aliases: [],
-          tags: [],
-          version: "0.0.1",
-        };
+      const custom_icons_path_files = await readdir(this.paths.custom.svgs);
+      const custom_icons: Meta[] = custom_icons_path_files
+        .filter((item) => extname(item) === ".svg")
+        .map((item, index) => {
+          const codepoint = available_codepoints[Math.floor(Math.random() * available_codepoints.length)];
+          available_codepoints = available_codepoints.filter((item) => item !== codepoint);
+          return {
+            name: parse(item).name,
+            id: `1k5-${index}`,
+            author: "Lab25",
+            codepoint: codepoint,
+            custom: true,
+            aliases: [],
+            tags: [],
+            version: "0.0.1",
+          };
+        });
+
+      this.meta = [...custom_icons, ...mdi_meta].filter((item) => {
+        return this.icons.includes(item.name) || mdi_meta.some((i) => i.aliases.includes(item.name) && this.icons.includes(i.name));
       });
 
-    this.meta = [...custom_icons, ...mdi_meta].filter((item) => {
-      return this.icons.includes(item.name) || mdi_meta.some((i) => i.aliases.includes(item.name) && this.icons.includes(i.name));
-    });
-
-    await this.check_svg_naming();
+      await this.check_svg_naming();
+    } catch (err) {
+      console.error(err);
+      return err;
+    }
   }
 
   private check_svg_naming(): Promise<void> {
@@ -249,6 +259,7 @@ export default class {
       await this.generateVariablesSCSS();
       console.log(`::: BUILD: generated webfont`);
     } catch (err) {
+      console.error(err);
       return err;
     }
   }
@@ -282,6 +293,7 @@ export default class {
       await writeFile(dist, template);
       console.log(`::: BUILD: generated _variables.scss`);
     } catch (err) {
+      console.error(err);
       return err;
     }
   };
