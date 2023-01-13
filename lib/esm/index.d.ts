@@ -76,10 +76,11 @@ export default class {
     };
     initialize(): Promise<void>;
     scan(): Promise<void>;
-    build(): Promise<unknown>;
+    build(): Promise<void>;
     private initialize_build;
     private check_svg_naming;
     private compile;
     private generateVariablesSCSS;
+    private writeFile;
 }
 export {};

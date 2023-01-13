@@ -138,26 +138,30 @@ export default class {
       exclude: (str: string) => !!(str.match(/\d+px/) || str.match(/rotate-\d+/) || str.match(/spin/)),
     };
 
-    await Promise.all(
-      files.map(async (file) => {
-        const rl = createInterface({
-          input: createReadStream(join(cwd, file)),
-          crlfDelay: Infinity,
-        });
+    try {
+      await Promise.all(
+        files.map(async (file) => {
+          const rl = createInterface({
+            input: createReadStream(join(cwd, file)),
+            crlfDelay: Infinity,
+          });
 
-        for await (const line of rl) {
-          const matches = expressions.icon(line);
-          if (matches)
-            matches.forEach((icon) => {
-              return icons.push(icon.replace("mdi-", ""));
-            });
-        }
-      })
-    );
+          for await (const line of rl) {
+            const matches = expressions.icon(line);
+            if (matches)
+              matches.forEach((icon) => {
+                return icons.push(icon.replace("mdi-", ""));
+              });
+          }
+        })
+      );
 
-    this.icons = [...new Set(icons)].filter((icon) => !expressions.exclude(icon));
+      this.icons = [...new Set(icons)].filter((icon) => !expressions.exclude(icon));
 
-    console.log(`::: SCANNER: found occurances of ${icons.length} icons (${this.icons.length} unique icons)`);
+      console.log(`::: SCANNER: found occurances of ${icons.length} icons (${this.icons.length} unique icons)`);
+    } catch (err) {
+      throw err;
+    }
   }
 
   public async build() {
@@ -167,8 +171,7 @@ export default class {
       await this.compile();
       console.log(`::: BUILD: done`);
     } catch (err) {
-      console.error(err);
-      return err;
+      throw err;
     }
   }
 
@@ -202,13 +205,12 @@ export default class {
 
       await this.check_svg_naming();
     } catch (err) {
-      console.error(err);
-      return err;
+      throw err;
     }
   }
 
-  private check_svg_naming(): Promise<void> {
-    return new Promise((resolve) => {
+  private async check_svg_naming() {
+    try {
       const errors: string[] = [];
 
       this.meta.forEach((icon) => {
@@ -234,13 +236,12 @@ export default class {
       });
 
       if (errors.length) {
-        errors.forEach((error) => console.error(error));
-        console.error("...");
-        process.exit(1);
+        throw errors;
       }
-
-      resolve();
-    });
+      return;
+    } catch (err) {
+      throw err;
+    }
   }
 
   private async compile() {
@@ -251,16 +252,15 @@ export default class {
       if (!existsSync(this.paths.dist.variables)) await mkdir(this.paths.dist.variables, { recursive: true });
       if (!existsSync(this.paths.dist.font)) await mkdir(this.paths.dist.font, { recursive: true });
 
-      await writeFile(join(this.paths.dist.font, `${fileName}-webfont.woff2`), result.woff2);
-      await writeFile(join(this.paths.dist.font, `${fileName}-webfont.eot`), result.eot);
-      await writeFile(join(this.paths.dist.font, `${fileName}-webfont.woff`), result.woff);
-      await writeFile(join(this.paths.dist.font, `${fileName}-webfont.ttf`), result.ttf);
+      await this.writeFile(join(this.paths.dist.font, `${fileName}-webfont.woff2`), result.woff2);
+      await this.writeFile(join(this.paths.dist.font, `${fileName}-webfont.eot`), result.eot);
+      await this.writeFile(join(this.paths.dist.font, `${fileName}-webfont.woff`), result.woff);
+      await this.writeFile(join(this.paths.dist.font, `${fileName}-webfont.ttf`), result.ttf);
 
       await this.generateVariablesSCSS();
       console.log(`::: BUILD: generated webfont`);
     } catch (err) {
-      console.error(err);
-      return err;
+      throw err;
     }
   }
 
@@ -290,11 +290,19 @@ export default class {
       this.meta.forEach((icon) => icons.push(`  "${icon.name}": ${icon.codepoint}`));
       template = template.replace(/icons: \(\)/, `icons: (\n${icons.join(",\n")}\n)`);
 
-      await writeFile(dist, template);
-      console.log(`::: BUILD: generated _variables.scss`);
+      await this.writeFile(dist, template);
+      console.log(`::: BUILD: generated _variables.scss, path: ${dist}`);
     } catch (err) {
-      console.error(err);
-      return err;
+      throw err;
     }
   };
+
+  private writeFile(path: string, contents: any) {
+    try {
+      console.log(`::: WRITING FILE: ${path}`);
+      writeFile(path, contents);
+    } catch (err) {
+      throw err;
+    }
+  }
 }
