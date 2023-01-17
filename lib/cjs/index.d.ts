@@ -65,13 +65,11 @@ export default class {
         fontHeight: number;
         descent: number;
         normalize: boolean;
-        centerHorizontally: boolean;
         version: string;
         svgicons2svgfont: {
             fontHeight: number;
             descent: number;
             normalize: boolean;
-            centerHorizontally: boolean;
         };
     };
     initialize(): Promise<void>;
