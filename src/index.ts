@@ -177,14 +177,11 @@ export default class {
     try {
       const mdi_meta: Meta[] = await Helper.readFileAndParse(this.paths.mdi.meta);
 
-      let available_codepoints = mdi_meta.filter((item) => !this.icons.includes(item.name)).map((item) => item.codepoint);
-
       const custom_icons_path_files = await readdir(this.paths.custom.svgs);
       const custom_icons: Meta[] = custom_icons_path_files
         .filter((item) => extname(item) === ".svg")
         .map((item, index) => {
-          const codepoint = available_codepoints[Math.floor(Math.random() * available_codepoints.length)];
-          available_codepoints = available_codepoints.filter((item) => item !== codepoint);
+          const codepoint = `FF${index < 256 ? "0" : ""}${index < 16 ? "0" : ""}${index.toString(16).toUpperCase()}`;
           return {
             name: parse(item).name,
             id: `1k5-${index}`,
